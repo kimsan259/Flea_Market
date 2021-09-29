@@ -36,4 +36,23 @@ public class HomeController {
 		return "home";
 	}
 	
+	
+	@RequestMapping(value = "/login")
+	public String login() {
+		
+		return "login";
+	}	
+	
+	@RequestMapping(value = "/findpassword")
+	public String findpassword() {
+		
+		return "findpassword";
+	}
+	@RequestMapping("/methodname")
+	public String m1(String E) {
+		logger.info("tag", E);
+		
+		return "home";
+	}
+	
 }
