@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import com.portfolio.Flea_Market.VO.BoardVO;
 import com.portfolio.Flea_Market.VO.MemberVO;
 
 public class BoardDAO {
@@ -40,39 +41,23 @@ public class BoardDAO {
 		return ""; //데이터베이스 오류
 	}
 	
-	//게시글 번호 부여 메소드
-	public int getNext() {
-		//현재 게시글을 내림차순으로 조회하여 가장 마지막 글의 번호를 구한다
-		String sql = "select bbsID from bbs order by bbsID desc";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				return rs.getInt(1) + 1;
-			}
-			return 1; //첫 번째 게시물인 경우
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1; //데이터베이스 오류
-	}
 	
 	//글쓰기 메소드
-	public int write(String boardTitle, String userID, String boardContent) {
-		String sql = "insert into bbs values(?, ?, ?, ?, ?, ?)";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, getNext());
-			pstmt.setString(2, boardTitle);
-			pstmt.setString(3, get());
-			pstmt.setString(4, getDate());
-			pstmt.setString(5, boardContent);
-			pstmt.setInt(6, 1); //글의 유효번호
-			return pstmt.executeUpdate();
-		}catch (Exception e) {
-			e.printStackTrace();
+		public int write(BoardVO user) {
+			String sql = "insert into bbs values(?, ?, ?, ?, ?, ?)";
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, user.getTITLE());
+				pstmt.setString(2, user.getPRICE());
+				pstmt.setString(3, user.getREGION());
+				pstmt.setString(4, user.getCONTENT());
+				pstmt.setString(5, user.getMASTER_NICKNME());
+				pstmt.setString(6, user.getMASTER_EMAIL());
+				return pstmt.executeUpdate();
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			return -1; //데이터베이스 오류
 		}
-		return -1; //데이터베이스 오류
+	    
 	}
-    
-}
