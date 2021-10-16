@@ -1,8 +1,8 @@
-package com.portfolio.Flea_Market.DAO;
+package com.portfolio.Flea_Market.SERVICE;
 
 import com.portfolio.Flea_Market.VO.MemberVO;
 
-public interface MemberDAO {
+public interface MemberService {
 
 	/**
 	 * 로그인
@@ -13,7 +13,7 @@ public interface MemberDAO {
 	public MemberVO login(MemberVO memberVo) throws Exception;
 	
 	/**
-	 * 가입하기
+	 * 회원가입
 	 * @param memberVo
 	 * @throws Exception
 	 */
