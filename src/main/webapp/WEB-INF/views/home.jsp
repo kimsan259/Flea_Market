@@ -103,7 +103,5 @@ style="font-style: normal ; font-weight: bolder; font-size: 1.5em;line-height: 1
 
   <!-- Bootstrap core JavaScript -->
     <script src="<c:url value="/resources/js/raphael.min.js" />">
-	<script src="<c:url value="/resources/js/morris.min.js" />">
-	<script src="<c:url value="/resources/js/morris-data.js" />">
   </body>
 </html>
