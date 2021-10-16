@@ -1,8 +1,8 @@
-package com.portfolio.Flea_Market.DAO;
+package com.portfolio.Flea_Market.SERVICE;
 
 import com.portfolio.Flea_Market.VO.BoardVO;
 
-public interface BoardDAO {
+public interface BoardService {
 
 	/**
 	 * 게시판 글쓰기
