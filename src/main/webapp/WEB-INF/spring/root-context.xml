@@ -12,20 +12,20 @@
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	
 	<!-- MySQL 로컬 접속 -->
-    <!-- <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
         <property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
-        <property name="url" value=""/>
-        <property name="username" value="root"/>
-        <property name="password" value="root"/>
-    </bean> -->
+        <property name="url" value="jdbc:log4jdbc:mysql://localhost:3307/flea_market?serverTimezone=UTC"/>
+        <property name="username" value="user"/>
+        <property name="password" value="5463324as"/>
+    </bean>
     
     <!-- MySQL 원격 접속 -->
-    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+    <!-- <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
         <property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
         <property name="url" value="jdbc:log4jdbc:mysql://192.168.0.9:3307/flea_market?serverTimezone=UTC"/>
         <property name="username" value="user"/>
         <property name="password" value="5463324as"/>
-    </bean>
+    </bean> -->
    
     <!-- Mybatis 연동 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -40,4 +40,8 @@
 
 	<!-- scan -->
 	<context:component-scan	base-package="com.portfolio.Flea_Market"></context:component-scan>
+	<context:component-scan base-package="com.portfolio.Flea_Market.SERVICE.BoardSERVICE"></context:component-scan>
+    <context:component-scan base-package="com.portfolio.Flea_Market.DAO.BoardDAO"></context:component-scan>
+    <context:component-scan base-package="com.portfolio.Flea_Market.VO.BoardVO"></context:component-scan>
+	
 </beans>

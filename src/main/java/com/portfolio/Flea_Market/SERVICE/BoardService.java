@@ -1,5 +1,7 @@
 package com.portfolio.Flea_Market.SERVICE;
 
+import java.util.List;
+
 import com.portfolio.Flea_Market.VO.BoardVO;
 
 public interface BoardService {
@@ -10,4 +12,7 @@ public interface BoardService {
 	 * @throws Exception
 	 */
 	public void write(BoardVO boardVo) throws Exception;
+	
+	// 게시글 목록 조회
+	public List<BoardVO> list() throws Exception;
 }

@@ -2,6 +2,7 @@ package com.portfolio.Flea_Market;
 
 import java.util.Locale;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -192,4 +193,41 @@ public class HomeController {
 		return "login";
 		
 	}
+	@Controller
+	public class BoardController {
+		
+		@Inject
+		BoardService service;
+		
+		// 게시판 글 작성 화면
+		@RequestMapping(value = "/views/writing", method = RequestMethod.GET)
+		public void writing() throws Exception{
+			logger.info("writing");
+			
+		}
+		
+		// 게시판 글 작성
+		@RequestMapping(value = "/board/write", method = RequestMethod.POST)
+		public String write(BoardVO boardVO) throws Exception{
+			logger.info("write");
+			
+			service.write(boardVO);
+			
+			return "redirect:/";
+		}
+		
+		// 게시판 목록 조회
+		@RequestMapping(value = "/list", method = RequestMethod.GET)
+		public String list(Model model) throws Exception{
+			logger.info("list");
+			
+			model.addAttribute("list",service.list());
+			
+			
+			return "board/list";
+			
+		}
+		
+	}
+	
 }
