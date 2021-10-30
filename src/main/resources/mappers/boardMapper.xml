@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardMapper">
+   <insert id="insert" parameterType="com.portfolio.Flea_Market.VO.BoardVO">
+   		INSERT INTO TB_BOARD(
+								 TITLE
+								,PRICE
+								,REGION
+								,CONTENT
+								,MASTER_NICKNAME
+								,MASTER_EMAIL
+								,REGIST_DATE
+								,APPLY_YN
+								   		
+   		)
+   		VALUES(
+   								 #{TITLE}
+   								,#{PRICE}
+   								,#{REGION}
+   								,#{CONTENT}
+   								,#{MASTER_NICKNAME}
+   								,#{MASTER_EMAIL}
+   								,DATE_FORMAT(SYSDATE(), '%Y-%m-%d')
+   								,'N'
+   		)
+   </insert>
+   	<select id="list" resultType="com.portfolio.Flea_Market.VO.BoardVO">
+		SELECT   
+				 NUMBER
+			   , TITLE
+			   , PRICE
+			   , REGION
+			   , CONTENT
+			   , MASTER_NICKNAME
+			   , MASTER_EMAIL
+			   , REGIST_DATE
+			   , APPLY_YN
+		  FROM TB_BOARD
+	</select>
+	
+	<select id="read" parameterType="int" resultType="com.portfolio.Flea_Market.VO.BoardVO">
+		SELECT
+				NUMBER	
+			  , TITLE
+			  , PRICE
+			  , REGION
+			  , CONTENT
+			  , MASTER_NICKNAME
+			  , MASTER_EMAIL
+			  , REGIST_DATE
+			  , APPLY_YN
+		 FROM TB_BOARD
+		 WHERE NUMBER = #{NUMBER}
+	</select>
+</mapper>
