@@ -7,8 +7,16 @@ public class BoardVO {
 	private String PRICE;
 	private String REGION;
 	private String CONTENT;
-	private String MASTER_NICKNME;
+	private String MASTER_NICKNAME;
 	private String MASTER_EMAIL;
+	private String REGIST_DATE;
+	
+	public String getREGIST_DATE() {
+		return REGIST_DATE;
+	}
+	public void setREGIST_DATE(String rEGIST_DATE) {
+		REGIST_DATE = rEGIST_DATE;
+	}
 	public int getNUMBER() {
 		return NUMBER;
 	}
@@ -39,11 +47,12 @@ public class BoardVO {
 	public void setCONTENT(String cONTENT) {
 		CONTENT = cONTENT;
 	}
-	public String getMASTER_NICKNME() {
-		return MASTER_NICKNME;
+	
+	public String getMASTER_NICKNAME() {
+		return MASTER_NICKNAME;
 	}
-	public void setMASTER_NICKNME(String mASTER_NICKNME) {
-		MASTER_NICKNME = mASTER_NICKNME;
+	public void setMASTER_NICKNAME(String mASTER_NICKNAME) {
+		MASTER_NICKNAME = mASTER_NICKNAME;
 	}
 	public String getMASTER_EMAIL() {
 		return MASTER_EMAIL;

@@ -40,8 +40,8 @@
 
 	<!-- scan -->
 	<context:component-scan	base-package="com.portfolio.Flea_Market"></context:component-scan>
-	<context:component-scan base-package="com.portfolio.Flea_Market.SERVICE.BoardSERVICE"></context:component-scan>
-    <context:component-scan base-package="com.portfolio.Flea_Market.DAO.BoardDAO"></context:component-scan>
-    <context:component-scan base-package="com.portfolio.Flea_Market.VO.BoardVO"></context:component-scan>
+	<context:component-scan base-package="com.portfolio.Flea_Market.SERVICE"></context:component-scan>
+    <context:component-scan base-package="com.portfolio.Flea_Market.DAO"></context:component-scan>
+    <context:component-scan base-package="com.portfolio.Flea_Market.VO"></context:component-scan>
 	
 </beans>

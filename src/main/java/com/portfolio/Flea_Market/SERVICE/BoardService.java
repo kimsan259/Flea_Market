@@ -15,4 +15,7 @@ public interface BoardService {
 	
 	// 게시글 목록 조회
 	public List<BoardVO> list() throws Exception;
+	
+	// 게시판 자세히 보기
+	public BoardVO read(int NUMBER) throws Exception;
 }

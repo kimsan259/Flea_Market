@@ -1,10 +1,13 @@
 package com.portfolio.Flea_Market;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,12 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/home")
-	public String home() {
+	public String home(Model model, HttpServletRequest request, HttpSession session) throws Exception{
+		
+		//board
+		List<BoardVO> tb_boards = boardService.list(); 
+		
+		model.addAttribute("tb_boards", tb_boards);
 		
 		return "home";
 	}
@@ -75,7 +83,7 @@ public class HomeController {
 	 * @throws Exception
 	 */
 	@RequestMapping("/writingaction")
-	public String writingaction(BoardVO boardVo) throws Exception {
+	public String writingaction(BoardVO boardVo, HttpServletRequest request) throws Exception {
 //		if(board.getTITLE() == null || board.getCONTENT() == null){
 //			PrintWriter script = response.getWriter();
 //			script.println("<script>");
@@ -105,11 +113,13 @@ public class HomeController {
 //		}	
 //		return "writingaction";
 		
+		request.setCharacterEncoding("UTF-8");
+		
 		logger.debug("게시판 글쓰기 action 중");
 		
 		boardService.write(boardVo);
 		
-		return "/"; // 게시판 목록으로
+		return "redirect:/home"; // 게시판 목록으로
 	}
 	
 	@RequestMapping("joinaction")
@@ -174,7 +184,7 @@ public class HomeController {
 				session.setAttribute("name",member.getNAME());
 				session.setAttribute("nickname",member.getNICKNAME());
 				session.setAttribute("phonenum",member.getPHONENUMBER());
-				url = "home";
+				url = "redirect:/home";
 			}
 		} catch (Exception e) {
 			url = "login";
@@ -193,41 +203,29 @@ public class HomeController {
 		return "login";
 		
 	}
-	@Controller
-	public class BoardController {
 		
-		@Inject
-		BoardService service;
 		
-		// 게시판 글 작성 화면
-		@RequestMapping(value = "/views/writing", method = RequestMethod.GET)
-		public void writing() throws Exception{
-			logger.info("writing");
+	// 게시판 목록 조회
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public String list(Model model) throws Exception{
+		logger.info("list");
 			
-		}
+		model.addAttribute("list",boardService.list());
 		
-		// 게시판 글 작성
-		@RequestMapping(value = "/board/write", method = RequestMethod.POST)
-		public String write(BoardVO boardVO) throws Exception{
-			logger.info("write");
-			
-			service.write(boardVO);
-			
-			return "redirect:/";
-		}
 		
-		// 게시판 목록 조회
-		@RequestMapping(value = "/list", method = RequestMethod.GET)
-		public String list(Model model) throws Exception{
-			logger.info("list");
-			
-			model.addAttribute("list",service.list());
-			
-			
-			return "board/list";
-			
-		}
+		return "board/list";
 		
 	}
+	
+	// 게시판 조회
+	@RequestMapping(value = "/readView", method = RequestMethod.GET)
+	public String read(BoardVO boardVO, Model model) throws Exception{
+		logger.info("read");
+		
+		model.addAttribute("read", boardService.read(boardVO.getNUMBER()));
+		
+		return "/readView";
+	}
+		
 	
 }

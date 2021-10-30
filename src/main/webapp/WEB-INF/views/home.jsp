@@ -15,7 +15,14 @@
 
   <!-- Custom styles for this template -->
   <link href="css/shop-homepage.css" rel="stylesheet">
-
+  <script type="text/javascript">
+  	
+  	//게시판 자세히
+  	function fn_readView(NUMBER) {
+		location.href="/readView?NUMBER=" + NUMBER;
+	}
+  
+  </script>
 </head>
    <body>
 	<%@ include file="header.jsp" %>
@@ -54,23 +61,23 @@
 <c:forEach var="tb_board" items="${tb_boards}">
 
           <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100">
+            <div style="cursor: pointer;" onclick="fn_readView(${tb_board.NUMBER})" class="card h-100">
               <a href="#"><img  style="width:250px;height:100px"
                src="resources\images\\still.png" alt="still.png"></a>
                <span
 style="font-style: normal ; font-weight: bolder; font-size: 1.5em;line-height: 1.0em; color: red;font-family: arial;
 ">
-              <h5> ${tb_board.REGION} 서울특별시 광진구 노현동</h5>
+              <h5> ${tb_board.REGION} </h5>
 </span>
               <div class="card-body">
                 <h4 class="card-title">
-                  <a href="#"> ${tb_board.TITLE}  Item One</a>
+                  <a href="#"> ${tb_board.TITLE}  </a>
                 </h4>
-                <h5>${tb_board.PRICE}   $24.99</h5>
-                <p class="card-text">${tb_board.CONTENT}   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!</p>
+                <h5>${tb_board.PRICE}   $  </h5>
+                <p class="card-text">${tb_board.CONTENT}  </p>
               </div>
               <div class="card-footer">
-           		<small class="text-muted">${tb_board.MASTER_EMAIL}MASTER_EMAIL</small>
+           		<small class="text-muted">${tb_board.MASTER_EMAIL}</small>
               </div>
             </div>
           </div>
