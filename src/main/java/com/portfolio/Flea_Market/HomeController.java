@@ -1,5 +1,6 @@
 package com.portfolio.Flea_Market;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -7,6 +8,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +17,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.portfolio.Flea_Market.SERVICE.BoardService;
 import com.portfolio.Flea_Market.SERVICE.MemberService;
+import com.portfolio.Flea_Market.UTIL.EmailUtil;
+import com.portfolio.Flea_Market.UTIL.PwRandom;
 import com.portfolio.Flea_Market.VO.BoardVO;
 import com.portfolio.Flea_Market.VO.MemberVO;
 
@@ -64,12 +70,59 @@ public class HomeController {
 		
 		return "findpassword";
 	}
+	
+	//비밀번호 찾기 action
 	@RequestMapping("/methodname")
-	public String m1(String E) {
-		logger.info("tag", E);
+	public String m1(MemberVO memberVo, RedirectAttributes rttr, Model model) throws Exception {
+
+		logger.debug("비밀번호 찾기 action~!~!!~");
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		String findPwFlag = "C";
 		
-		return "home";
+		try {
+			
+			MemberVO email = memberService.findEmail(memberVo);
+			
+			if (email != null) {
+				
+				//Pw 랜덤
+				PwRandom pwRan = new PwRandom();
+				//대문자 제거 할거면 false , 비밀번호 자리수 선택
+				String uptPw = pwRan.getKey(false, 15);
+
+				//Pw 변경
+				memberVo.setPASSWORD(uptPw);
+				int cnt = memberService.pwUpdate(memberVo);
+				
+				if (cnt > 0) {
+					//이메일 보내기
+					EmailUtil emailUtil = new EmailUtil();
+					
+					emailUtil.mailSend(email.getEMAIL(), uptPw);
+					
+					findPwFlag = "A";
+				} else {
+					findPwFlag = "C";
+				}
+				
+			} else {
+				//이메일이 없음
+				findPwFlag = "B";
+			}
+			
+			
+		} catch (Exception e) {
+			findPwFlag = "C"; // 오류
+			logger.info(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			rttr.addFlashAttribute("findPwFlag", findPwFlag);
+			model.addAttribute("findPwFlag", findPwFlag);
+		}
+		
+		return "findpassword";
 	}
+	
 	@RequestMapping("/writing")
 	public String writing() {
 		

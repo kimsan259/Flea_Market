@@ -294,6 +294,13 @@
 	        <artifactId>httpclient</artifactId>
 	        <version>4.5.13</version>
 	    </dependency>
+	    
+	    <!-- java mail 메일 -->
+	    <dependency>
+	        <groupId>javax.mail</groupId>
+	        <artifactId>mail</artifactId>
+	        <version>1.4.7</version>
+	    </dependency>
 	        
 	</dependencies>
     <build>
