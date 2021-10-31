@@ -1,5 +1,6 @@
 package com.portfolio.Flea_Market;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -7,6 +8,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +17,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.portfolio.Flea_Market.SERVICE.BoardService;
 import com.portfolio.Flea_Market.SERVICE.MemberService;
+import com.portfolio.Flea_Market.UTIL.EmailUtil;
+import com.portfolio.Flea_Market.UTIL.PwRandom;
 import com.portfolio.Flea_Market.VO.BoardVO;
 import com.portfolio.Flea_Market.VO.MemberVO;
 
@@ -64,12 +70,59 @@ public class HomeController {
 		
 		return "findpassword";
 	}
+	
+	//비밀번호 찾기 action
 	@RequestMapping("/methodname")
-	public String m1(String E) {
-		logger.info("tag", E);
+	public String m1(MemberVO memberVo, RedirectAttributes rttr, Model model) throws Exception {
+
+		logger.debug("비밀번호 찾기 action~!~!!~");
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		String findPwFlag = "C";
 		
-		return "home";
+		try {
+			
+			MemberVO email = memberService.findEmail(memberVo);
+			
+			if (email != null) {
+				
+				//Pw 랜덤
+				PwRandom pwRan = new PwRandom();
+				//대문자 제거 할거면 false , 비밀번호 자리수 선택
+				String uptPw = pwRan.getKey(false, 15);
+
+				//Pw 변경
+				memberVo.setPASSWORD(uptPw);
+				int cnt = memberService.pwUpdate(memberVo);
+				
+				if (cnt > 0) {
+					//이메일 보내기
+					EmailUtil emailUtil = new EmailUtil();
+					
+					emailUtil.mailSend(email.getEMAIL(), uptPw);
+					
+					findPwFlag = "A";
+				} else {
+					findPwFlag = "C";
+				}
+				
+			} else {
+				//이메일이 없음
+				findPwFlag = "B";
+			}
+			
+			
+		} catch (Exception e) {
+			findPwFlag = "C"; // 오류
+			logger.info(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			rttr.addFlashAttribute("findPwFlag", findPwFlag);
+			model.addAttribute("findPwFlag", findPwFlag);
+		}
+		
+		return "findpassword";
 	}
+	
 	@RequestMapping("/writing")
 	public String writing() {
 		
@@ -77,7 +130,7 @@ public class HomeController {
 	}
 	
 	/**
-	 * 게시판 글쓰기
+	 * 寃뚯떆�뙋 湲��벐湲�
 	 * @param board
 	 * @return
 	 * @throws Exception
@@ -87,26 +140,26 @@ public class HomeController {
 //		if(board.getTITLE() == null || board.getCONTENT() == null){
 //			PrintWriter script = response.getWriter();
 //			script.println("<script>");
-//			script.println("alert('입력이 안 된 사항이 있습니다')");
+//			script.println("alert('�엯�젰�씠 �븞 �맂 �궗�빆�씠 �엳�뒿�땲�떎')");
 //			script.println("history.back()");
 //			script.println("</script>");
 //		}else{
-			// 정상적으로 입력이 되었다면 글쓰기 로직을 수행한다
+			// �젙�긽�쟻�쑝濡� �엯�젰�씠 �릺�뿀�떎硫� 湲��벐湲� 濡쒖쭅�쓣 �닔�뻾�븳�떎
 //			MemberDAO memberDAO = new MemberDAO();
 //			BoardDAO boardDAO = new BoardDAO();
 //			int result = boardDAO.write(board.getTITLE(), board.getCONTENT());
-//			// 데이터베이스 오류인 경우
+//			// �뜲�씠�꽣踰좎씠�뒪 �삤瑜섏씤 寃쎌슦
 //			if(result == -1){
 //				PrintWriter script = response.getWriter();
 //				script.println("<script>");
-//				script.println("alert('글쓰기에 실패했습니다')");
+//				script.println("alert('湲��벐湲곗뿉 �떎�뙣�뻽�뒿�땲�떎')");
 //				script.println("history.back()");
 //				script.println("</script>");
-//			// 글쓰기가 정상적으로 실행되면 알림창을 띄우고 게시판 메인으로 이동한다
+//			// 湲��벐湲곌� �젙�긽�쟻�쑝濡� �떎�뻾�릺硫� �븣由쇱갹�쓣 �쓣�슦怨� 寃뚯떆�뙋 硫붿씤�쑝濡� �씠�룞�븳�떎
 //			}else {
 //				PrintWriter script = response.getWriter();
 //				script.println("<script>");
-//				script.println("alert('글쓰기 성공')");
+//				script.println("alert('湲��벐湲� �꽦怨�')");
 //				script.println("location.href='bbs.jsp'");
 //				script.println("</script>");
 //			}
@@ -115,11 +168,11 @@ public class HomeController {
 		
 		request.setCharacterEncoding("UTF-8");
 		
-		logger.debug("게시판 글쓰기 action 중");
+		logger.debug("寃뚯떆�뙋 湲��벐湲� action 以�");
 		
 		boardService.write(boardVo);
 		
-		return "redirect:/home"; // 게시판 목록으로
+		return "redirect:/home"; // 寃뚯떆�뙋 紐⑸줉�쑝濡�
 	}
 	
 	@RequestMapping("joinaction")
@@ -128,18 +181,18 @@ public class HomeController {
 //				|| member.getNICKNAME() == null || member.getPHONENUMBER() == null) {
 //				
 //			} else {
-//				MemberDAO memberDAO = new MemberDAO(); // 인스턴스 생성
+//				MemberDAO memberDAO = new MemberDAO(); // �씤�뒪�꽩�뒪 �깮�꽦
 //				int result = memberDAO.join(member);
 //				
-//				if(result == -1) { //아이디가 기본키가 , 중복되면 오류
+//				if(result == -1) { //�븘�씠�뵒媛� 湲곕낯�궎媛� , 以묐났�릺硫� �삤瑜�
 //					
 //				}
-//				// 가입성공
+//				// 媛��엯�꽦怨�
 //				else {
 //				
 //				}
 //			}
-		logger.debug("회원가입 하기");
+		logger.debug("�쉶�썝媛��엯 �븯湲�");
 		
 		memberService.join(member);
 		
@@ -148,12 +201,12 @@ public class HomeController {
 	
 	@RequestMapping("loginaction")
 	public String b(MemberVO member,HttpSession session) {
-//		MemberDAO merberDao = new MemberDAO(); // 인스턴스 생성
+//		MemberDAO merberDao = new MemberDAO(); // �씤�뒪�꽩�뒪 �깮�꽦
 //		int result = merberDao.login(member.getEMAIL(),member.getPASSWORD());
 //		System.out.println("Result: ");
 //		System.out.println(result);
 //		
-//		// 로그인 성공
+//		// 濡쒓렇�씤 �꽦怨�
 //		if(result == 1) {
 //			session.setAttribute("email",member.getEMAIL());
 //			session.setAttribute("name",member.getNAME());
@@ -161,15 +214,15 @@ public class HomeController {
 //			session.setAttribute("phonenum",member.getPHONENUMBER());
 //			return "home";
 //			}
-//			// 로그인 실패
+//			// 濡쒓렇�씤 �떎�뙣
 //			else if(result == 0) {
 //				return "login";
 //			}
-//			// 아이디 없음
+//			// �븘�씠�뵒 �뾾�쓬
 //			else if(result == -1) {
 //				return "login";
 //			}
-//			// DB 오류
+//			// DB �삤瑜�
 //			else if(result == -2) {
 //				return "login";
 //			}
@@ -205,7 +258,7 @@ public class HomeController {
 	}
 		
 		
-	// 게시판 목록 조회
+	// 寃뚯떆�뙋 紐⑸줉 議고쉶
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String list(Model model) throws Exception{
 		logger.info("list");
@@ -217,7 +270,7 @@ public class HomeController {
 		
 	}
 	
-	// 게시판 조회
+	// 寃뚯떆�뙋 議고쉶
 	@RequestMapping(value = "/readView", method = RequestMethod.GET)
 	public String read(BoardVO boardVO, Model model) throws Exception{
 		logger.info("read");

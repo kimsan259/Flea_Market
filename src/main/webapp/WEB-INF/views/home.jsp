@@ -64,9 +64,7 @@
             <div style="cursor: pointer;" onclick="fn_readView(${tb_board.NUMBER})" class="card h-100">
               <a href="#"><img  style="width:250px;height:100px"
                src="resources\images\\still.png" alt="still.png"></a>
-               <span
-style="font-style: normal ; font-weight: bolder; font-size: 1.5em;line-height: 1.0em; color: red;font-family: arial;
-">
+               <span style="font-style: normal ; font-weight: bolder; font-size: 1.5em; line-height: 1.0em; color: red;font-family: arial;">
               <h5> ${tb_board.REGION} </h5>
 </span>
               <div class="card-body">

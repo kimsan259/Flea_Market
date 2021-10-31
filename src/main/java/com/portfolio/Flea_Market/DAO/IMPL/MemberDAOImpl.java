@@ -24,6 +24,15 @@ public class MemberDAOImpl implements MemberDAO{
 	public void join(MemberVO memberVo) throws Exception {
 		sqlSession.insert("memberMapper.join", memberVo);
 	}
-	
+
+	@Override
+	public MemberVO findEmail(MemberVO memberVo) throws Exception {
+		return sqlSession.selectOne("memberMapper.findEmail", memberVo);
+	}
+
+	@Override
+	public int pwUpdate(MemberVO memberVo) throws Exception {
+		return sqlSession.update("memberMapper.pwUpdate", memberVo);
+	}
 	
 }

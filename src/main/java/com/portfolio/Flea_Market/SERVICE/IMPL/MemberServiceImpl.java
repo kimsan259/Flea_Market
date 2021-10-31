@@ -24,4 +24,14 @@ public class MemberServiceImpl implements MemberService{
 	public void join(MemberVO memberVo) throws Exception {
 		dao.join(memberVo);
 	}
+
+	@Override
+	public MemberVO findEmail(MemberVO memberVo) throws Exception {
+		return dao.findEmail(memberVo);
+	}
+
+	@Override
+	public int pwUpdate(MemberVO memberVo) throws Exception {
+		return dao.pwUpdate(memberVo);
+	}
 }

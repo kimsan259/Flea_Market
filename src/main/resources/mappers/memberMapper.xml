@@ -34,4 +34,18 @@
 								,#{PHONENUMBER}
 		)
 	</insert>
+	
+	<!-- 비밀번호 변경을 위한 이메일 찾기 -->
+	<select id="findEmail" parameterType="com.portfolio.Flea_Market.VO.MemberVO" resultType="com.portfolio.Flea_Market.VO.MemberVO">
+		SELECT
+				EMAIL
+		FROM	TB_MEMBER
+		WHERE	EMAIL = #{EMAIL}
+	</select>
+	
+	<update id="pwUpdate" parameterType="com.portfolio.Flea_Market.VO.MemberVO">
+		UPDATE TB_MEMBER SET
+		PASSWORD = #{PASSWORD}
+		WHERE EMAIL = #{EMAIL}
+	</update>
 </mapper>
