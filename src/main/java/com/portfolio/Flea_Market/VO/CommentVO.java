@@ -1,13 +1,14 @@
 package com.portfolio.Flea_Market.VO;
 
-public class CommentVO {
-	private int NUMBER;
+public class CommentVO extends PageVO{
+	private int NUMBER; 
 	private String UPPER_NUMBER;
 	private String BOARD_NUMBER;
 	private String MEMBER_NICKNAME;
 	private String MASTER_NICKNAME;
 	private String CONTENT;
 	private String REGIST_DATE;
+
 	public int getNUMBER() {
 		return NUMBER;
 	}

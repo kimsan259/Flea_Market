@@ -15,21 +15,34 @@ public class BoardDAOImpl implements BoardDAO {
 
 	@Autowired
 	private SqlSession sqlSession;
-	// 게시글 작성
+	// 寃뚯떆湲� �옉�꽦
 	@Override
 	public void write(BoardVO boardVo) throws Exception {
 		sqlSession.insert("boardMapper.insert", boardVo);
 	}
-	// 게시글 목록 조회
-	public List<BoardVO> list() throws Exception {
+	// 寃뚯떆湲� 紐⑸줉 議고쉶
+	public List<BoardVO> list(BoardVO vo) throws Exception {
 		
-		return sqlSession.selectList("boardMapper.list");
+		return sqlSession.selectList("boardMapper.list", vo);
 	}
-	// 게시물 조회
+	// 寃뚯떆臾� 議고쉶
 	@Override
 	public BoardVO read(int NUMBER) throws Exception {
 			
 		return sqlSession.selectOne("boardMapper.read", NUMBER);
+	}
+	// 寃뚯떆臾� �닔�젙
+	@Override
+	public void update(BoardVO boardVO) throws Exception {
+		
+		sqlSession.update("boardMapper.update", boardVO);
+	}
+
+	// 寃뚯떆臾� �궘�젣
+	@Override
+	public void delete(int NUMBER) throws Exception {
+		
+		sqlSession.delete("boardMapper.delete", NUMBER);
 	}
 
 	

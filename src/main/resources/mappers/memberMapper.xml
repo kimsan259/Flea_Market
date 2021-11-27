@@ -4,7 +4,6 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="memberMapper">
-	
 	<!-- 로그인 -->
 	<select id="login" parameterType="com.portfolio.Flea_Market.VO.MemberVO" resultType="com.portfolio.Flea_Market.VO.MemberVO">
 		SELECT
@@ -48,4 +47,12 @@
 		PASSWORD = #{PASSWORD}
 		WHERE EMAIL = #{EMAIL}
 	</update>
+
+	<!-- 회원정보 수정 -->
+		<update id="memberUpdate">
+			UPDATE TB_MEMBER SET 
+			PASSWORD = #{PASSWORD},
+			NAME = #{NAME}
+			WHERE EMAIL = #{EMAIL}
+		</update>
 </mapper>

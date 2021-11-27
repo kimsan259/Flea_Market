@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="commentMapper">
+	
+	<!-- 페이징 Header -->
+	<sql id="pagingHeader">
+		<![CDATA[
+		SELECT
+		    BOARD2.*
+		FROM(
+		    SELECT
+		        COUNT(*) OVER() AS totalRecordCount,
+		        BOARD1.*
+		    FROM(
+		]]>
+	</sql>
+
+	<!-- 페이징 Footer -->
+	<sql id="pagingFooter">
+		<![CDATA[
+                 			 ) BOARD1
+			) BOARD2
+			WHERE	BOARD2.RNUM BETWEEN ${start} AND ${end}
+		]]>
+	</sql>
+	
+	<!-- 답변리스트 뽑기 (페이징 포함) -->
+	<select id="selectCommentList" parameterType="com.portfolio.Flea_Market.VO.CommentVO" resultType="com.portfolio.Flea_Market.VO.CommentVO">
+			SELECT
+					 ROW_NUMBER() OVER (ORDER BY NUMBER DESC) AS RNUM
+					,NUMBER 
+					,UPPER_NUMBER 
+					,BOARD_NUMBER 
+					,MEMBER_NICKNAME  
+					,MASTER_NICKNAME  
+					,CONTENT 
+					,REGIST_DATE
+			FROM	TB_COMMENT
+			WHERE	1=1
+			AND		BOARD_NUMBER = #{BOARD_NUMBER} 
+	</select>
+	
+	<!-- 댓글 작성 -->
+	<insert id="writeReply" parameterType="com.portfolio.Flea_Market.VO.CommentVO">
+		INSERT INTO TB_COMMENT(
+			UPPER_NUMBER
+			, BOARD_NUMBER
+			, MEMBER_NICKNAME
+			, MASTER_NICKNAME
+			, CONTENT
+			, REGIST_DATE
+		)
+		VALUES(    #{UPPER_NUMBER}
+			, #{BOARD_NUMBER}
+			, #{MEMBER_NICKNAME}
+			, #{MASTER_NICKNAME}
+			, #{CONTENT}	
+			, DATE_FORMAT(SYSDATE(), '%Y-%m-%d')
+			)
+	</insert>
+	
+	<!-- 댓글 수정 -->
+	<update id="updateReply" parameterType="com.portfolio.Flea_Market.VO.CommentVO">
+		UPDATE TB_COMMENT
+		SET		CONTENT = #{CONTENT}
+		WHERE	NUMBER = #{NUMBER}
+	</update>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="deleteReply" parameterType="com.portfolio.Flea_Market.VO.CommentVO">
+		DELETE FROM TB_COMMENT
+		WHERE NUMBER = #{NUMBER}
+	</delete>
+	
+</mapper>

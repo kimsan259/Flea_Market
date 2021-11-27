@@ -1,6 +1,6 @@
 package com.portfolio.Flea_Market.VO;
 
-public class MemberVO {
+public class MemberVO extends PageVO{
 
 	private String EMAIL;
 	private String PASSWORD;

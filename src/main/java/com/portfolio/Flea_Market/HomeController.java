@@ -1,6 +1,7 @@
 package com.portfolio.Flea_Market;
 
 import java.util.HashMap;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -13,18 +14,24 @@ import org.apache.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.portfolio.Flea_Market.SERVICE.BoardService;
+import com.portfolio.Flea_Market.SERVICE.CommentService;
 import com.portfolio.Flea_Market.SERVICE.MemberService;
+import com.portfolio.Flea_Market.SERVICE.ReplyService;
 import com.portfolio.Flea_Market.UTIL.EmailUtil;
+import com.portfolio.Flea_Market.UTIL.Pagination;
 import com.portfolio.Flea_Market.UTIL.PwRandom;
 import com.portfolio.Flea_Market.VO.BoardVO;
+import com.portfolio.Flea_Market.VO.CommentVO;
 import com.portfolio.Flea_Market.VO.MemberVO;
 
 /**
@@ -41,6 +48,12 @@ public class HomeController {
 	@Autowired
 	private MemberService memberService;
 	
+	@Autowired
+	private CommentService commentService;
+	
+	@Autowired
+	private ReplyService replyService;
+			
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
@@ -51,12 +64,50 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/home")
-	public String home(Model model, HttpServletRequest request, HttpSession session) throws Exception{
+	public String home(@ModelAttribute("paramVo") BoardVO vo, Model model, HttpServletRequest request, HttpSession session) throws Exception{
 		
-		//board
-		List<BoardVO> tb_boards = boardService.list(); 
+		//board paging구현
+		Pagination pagination = new Pagination();
+		List<BoardVO> tb_boards = null;
 		
-		model.addAttribute("tb_boards", tb_boards);
+		try {
+			
+			//페이징 start
+			int totalRecordCount = 0;
+			int currentPageNo = vo.getCurrentPageNo();
+			int pageSize = 5;
+			int recordCountPerPage = vo.getRecordCountPerPage();
+			
+			//select 박스 검색 보기 갯수
+			if (recordCountPerPage == 0) {
+				vo.setRecordCountPerPage(1);
+			}
+			
+			// 현재페이지 초기화
+			if (currentPageNo == 0) {
+				vo.setCurrentPageNo(1);
+			}
+			
+			HashMap<String, Integer> rangeMap = pagination.calcDataRange(currentPageNo, recordCountPerPage);
+			vo.setStart(rangeMap.get("firstRecordIndex"));
+			vo.setEnd(rangeMap.get("lastRecordIndex"));
+			
+			//board
+			tb_boards = boardService.list(vo); 
+			
+			if (tb_boards.size() > 0) {
+				totalRecordCount = Integer.parseInt(String.valueOf(tb_boards.get(0).getTotalRecordCount()));
+			}
+			
+			HashMap<String, Integer> pagerMap = pagination.calcPagerElement(currentPageNo, totalRecordCount, recordCountPerPage, pageSize);
+			
+			model.addAttribute("tb_boards", tb_boards);
+			model.addAttribute("pagerMap", pagerMap);
+			
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			e.printStackTrace();
+		}
 		
 		return "home";
 	}
@@ -71,7 +122,7 @@ public class HomeController {
 		return "findpassword";
 	}
 	
-	//비밀번호 찾기 action
+	// 비밀번호 찾기 action
 	@RequestMapping("/methodname")
 	public String m1(MemberVO memberVo, RedirectAttributes rttr, Model model) throws Exception {
 
@@ -87,7 +138,7 @@ public class HomeController {
 				
 				//Pw 랜덤
 				PwRandom pwRan = new PwRandom();
-				//대문자 제거 할거면 false , 비밀번호 자리수 선택
+				//대문자 제거할거면 false, 비밀번호 자리수 선택
 				String uptPw = pwRan.getKey(false, 15);
 
 				//Pw 변경
@@ -122,6 +173,25 @@ public class HomeController {
 		
 		return "findpassword";
 	}
+	@RequestMapping(value="/memberUpdateView", method = RequestMethod.GET)
+	public String registerUpdateView(MemberVO vo, Model model, HttpSession session) throws Exception{
+		
+		vo.setEMAIL((String) session.getAttribute("email"));
+		vo.setNAME((String) session.getAttribute("name"));
+		
+		model.addAttribute("member", vo);
+		return "/memberUpdateView";
+	}
+
+	@RequestMapping(value="/memberUpdate", method = RequestMethod.POST)
+	public String registerUpdate(MemberVO vo, HttpSession session) throws Exception{
+		
+		memberService.memberUpdate(vo);
+		
+		session.invalidate();
+		
+		return "redirect:/";
+	}
 	
 	@RequestMapping("/writing")
 	public String writing() {
@@ -130,7 +200,7 @@ public class HomeController {
 	}
 	
 	/**
-	 * 寃뚯떆�뙋 湲��벐湲�
+	 * 게시판 글쓰기
 	 * @param board
 	 * @return
 	 * @throws Exception
@@ -140,26 +210,26 @@ public class HomeController {
 //		if(board.getTITLE() == null || board.getCONTENT() == null){
 //			PrintWriter script = response.getWriter();
 //			script.println("<script>");
-//			script.println("alert('�엯�젰�씠 �븞 �맂 �궗�빆�씠 �엳�뒿�땲�떎')");
+//			script.println("alert('입력이 안된 사항이 있습니다.')");
 //			script.println("history.back()");
 //			script.println("</script>");
 //		}else{
-			// �젙�긽�쟻�쑝濡� �엯�젰�씠 �릺�뿀�떎硫� 湲��벐湲� 濡쒖쭅�쓣 �닔�뻾�븳�떎
+			// 정상적으로 입력이 되었다면 글쓰기 로직을 수행한다.
 //			MemberDAO memberDAO = new MemberDAO();
 //			BoardDAO boardDAO = new BoardDAO();
 //			int result = boardDAO.write(board.getTITLE(), board.getCONTENT());
-//			// �뜲�씠�꽣踰좎씠�뒪 �삤瑜섏씤 寃쎌슦
+//			// 데이터베이스 오류인 경우
 //			if(result == -1){
 //				PrintWriter script = response.getWriter();
 //				script.println("<script>");
-//				script.println("alert('湲��벐湲곗뿉 �떎�뙣�뻽�뒿�땲�떎')");
+//				script.println("alert('글쓰기에 실패했습니다.')");
 //				script.println("history.back()");
 //				script.println("</script>");
-//			// 湲��벐湲곌� �젙�긽�쟻�쑝濡� �떎�뻾�릺硫� �븣由쇱갹�쓣 �쓣�슦怨� 寃뚯떆�뙋 硫붿씤�쑝濡� �씠�룞�븳�떎
+//			// 글쓰기가 정상적으로 실행되면 알림창을 띄우고 게시판 메인으로 이동한다
 //			}else {
 //				PrintWriter script = response.getWriter();
 //				script.println("<script>");
-//				script.println("alert('湲��벐湲� �꽦怨�')");
+//				script.println("alert('글쓰기 성공')");
 //				script.println("location.href='bbs.jsp'");
 //				script.println("</script>");
 //			}
@@ -168,11 +238,11 @@ public class HomeController {
 		
 		request.setCharacterEncoding("UTF-8");
 		
-		logger.debug("寃뚯떆�뙋 湲��벐湲� action 以�");
+		logger.debug("게시판 글쓰기 action 중");
 		
 		boardService.write(boardVo);
 		
-		return "redirect:/home"; // 寃뚯떆�뙋 紐⑸줉�쑝濡�
+		return "redirect:/home"; // 게시판 목록으로
 	}
 	
 	@RequestMapping("joinaction")
@@ -181,18 +251,18 @@ public class HomeController {
 //				|| member.getNICKNAME() == null || member.getPHONENUMBER() == null) {
 //				
 //			} else {
-//				MemberDAO memberDAO = new MemberDAO(); // �씤�뒪�꽩�뒪 �깮�꽦
+//				MemberDAO memberDAO = new MemberDAO(); // 인스턴스 생성
 //				int result = memberDAO.join(member);
 //				
-//				if(result == -1) { //�븘�씠�뵒媛� 湲곕낯�궎媛� , 以묐났�릺硫� �삤瑜�
+//				if(result == -1) { // 아이디가 기본키가, 중복되면 오류
 //					
 //				}
-//				// 媛��엯�꽦怨�
+//				// 가입성공
 //				else {
 //				
 //				}
 //			}
-		logger.debug("�쉶�썝媛��엯 �븯湲�");
+		logger.debug("회원가입하기");
 		
 		memberService.join(member);
 		
@@ -200,13 +270,14 @@ public class HomeController {
 	}
 	
 	@RequestMapping("loginaction")
-	public String b(MemberVO member,HttpSession session) {
-//		MemberDAO merberDao = new MemberDAO(); // �씤�뒪�꽩�뒪 �깮�꽦
+	public String b(MemberVO member, HttpServletRequest request) {
+		
+//		MemberDAO merberDao = new MemberDAO(); // 인스턴스 생성
 //		int result = merberDao.login(member.getEMAIL(),member.getPASSWORD());
 //		System.out.println("Result: ");
 //		System.out.println(result);
 //		
-//		// 濡쒓렇�씤 �꽦怨�
+//		// 로그인 성공
 //		if(result == 1) {
 //			session.setAttribute("email",member.getEMAIL());
 //			session.setAttribute("name",member.getNAME());
@@ -214,15 +285,15 @@ public class HomeController {
 //			session.setAttribute("phonenum",member.getPHONENUMBER());
 //			return "home";
 //			}
-//			// 濡쒓렇�씤 �떎�뙣
+//			// 로그인 실패
 //			else if(result == 0) {
 //				return "login";
 //			}
-//			// �븘�씠�뵒 �뾾�쓬
+//			// 아이디 없음
 //			else if(result == -1) {
 //				return "login";
 //			}
-//			// DB �삤瑜�
+//			// DB 없음
 //			else if(result == -2) {
 //				return "login";
 //			}
@@ -230,13 +301,18 @@ public class HomeController {
 		MemberVO memberVo;
 		String url = "login";
 		
+		HttpSession session = request.getSession();
+		
 		try {
 			memberVo = memberService.login(member);
 			if (memberVo != null) {
-				session.setAttribute("email",member.getEMAIL());
-				session.setAttribute("name",member.getNAME());
-				session.setAttribute("nickname",member.getNICKNAME());
-				session.setAttribute("phonenum",member.getPHONENUMBER());
+				
+				//세션 유지
+				session.setMaxInactiveInterval(30*60);
+				
+				//객체값으로 저장해야 할듯
+				session.setAttribute("sessionMember", memberVo);
+				
 				url = "redirect:/home";
 			}
 		} catch (Exception e) {
@@ -257,28 +333,113 @@ public class HomeController {
 		
 	}
 		
-		
-	// 寃뚯떆�뙋 紐⑸줉 議고쉶
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String list(Model model) throws Exception{
-		logger.info("list");
-			
-		model.addAttribute("list",boardService.list());
-		
-		
-		return "board/list";
-		
-	}
+
 	
-	// 寃뚯떆�뙋 議고쉶
+	// 게시판 자세히 보기
 	@RequestMapping(value = "/readView", method = RequestMethod.GET)
-	public String read(BoardVO boardVO, Model model) throws Exception{
-		logger.info("read");
+	public String read(@ModelAttribute("paramVo") CommentVO vo, Model model, HttpServletRequest request) throws Exception{
+		logger.info("readView");
+		List<CommentVO> replyList = null;
+		MemberVO sessionMember = null;
 		
-		model.addAttribute("read", boardService.read(boardVO.getNUMBER()));
+		try {
+			
+			//세션값 가져오기 (수정 삭제버튼 보여주기 체크)
+			sessionMember = (MemberVO) request.getSession().getAttribute("sessionMember");
+			
+			//이 number는 게시판 번호 CommentVO number와 다름 (대체하기 위해 씀 문제는 없음)
+			model.addAttribute("read", boardService.read(vo.getNUMBER()));
+
+			//Number가 숫자라 문자로 변환함
+			//답글 게시판 조회
+			vo.setBOARD_NUMBER("" + vo.getNUMBER());
+			
+			replyList = commentService.selectCommentList(vo);
+			
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		model.addAttribute("replyList", replyList);
+		model.addAttribute("sessionMember", sessionMember);
 		
 		return "/readView";
 	}
+	
+	// 게시판 수정뷰 ???
+	@RequestMapping(value = "/updateView")
+	public String updateView(BoardVO boardVO, Model model) throws Exception{
+		logger.info("updateView");
 		
+		model.addAttribute("update", boardService.read(boardVO.getNUMBER()));
+		
+		return "/updateView";
+	}
+	
+	// 게시판 수정
+	@RequestMapping(value = "/update")
+	public String update(BoardVO boardVO) throws Exception{
+		logger.info("update");
+		
+		boardService.update(boardVO);
+		
+		return "redirect:/home";
+	}
+
+	// 게시판 삭제
+	@RequestMapping(value = "/delete")
+	public String delete(BoardVO boardVO) throws Exception{
+		logger.info("delete");
+		
+		boardService.delete(boardVO.getNUMBER());
+		
+		return "redirect:/home";
+	}
+
+	// 게시판 답글 작성저장
+	@RequestMapping(value = "/reply")
+	public String replyWrite(CommentVO commentVo, HttpSession session, HttpServletRequest request) throws Exception{
+		
+		logger.info("replyWrite");
+		
+		MemberVO sessionMember = (MemberVO) request.getSession().getAttribute("sessionMember");
+		
+		//로그인 한 회원 이름 가져오기
+		commentVo.setMASTER_NICKNAME(sessionMember.getNICKNAME());
+		commentVo.setUPPER_NUMBER("0");
+		commentVo.setMEMBER_NICKNAME(sessionMember.getNICKNAME());
+		
+		commentService.writeReply(commentVo);
+		
+		return "redirect:/readView?NUMBER=" + commentVo.getBOARD_NUMBER();
+	}
+	
+	
+	//게시판 답글 수정하기
+	@RequestMapping(value = "/replyUpdate")
+	public String replyUpdate(CommentVO commentVo, HttpSession session, HttpServletRequest request) throws Exception{
+		
+		System.out.println("게시판 넘버 " + commentVo.getBOARD_NUMBER());
+		System.out.println("답글 넘버  " + commentVo.getNUMBER());
+
+		commentVo.setCONTENT(commentVo.getCONTENT().replace(",", " "));
+		
+		commentService.updateReply(commentVo);
+		
+		return "redirect:/readView?NUMBER=" + commentVo.getBOARD_NUMBER();
+	}
+	
+	//게시판 답글 삭제하기
+	@RequestMapping(value = "/replyDelete")
+	public String replyDelete(CommentVO commentVo, HttpSession session, HttpServletRequest request) throws Exception{
+		
+		System.out.println("게시판 넘버 " + commentVo.getBOARD_NUMBER());
+		System.out.println("답글 넘버  " + commentVo.getNUMBER());
+		
+		commentService.deleteReply(commentVo);
+		
+		return "redirect:/readView?NUMBER=" + commentVo.getBOARD_NUMBER();
+	}
 	
 }

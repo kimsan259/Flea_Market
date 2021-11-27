@@ -7,17 +7,24 @@ import com.portfolio.Flea_Market.VO.BoardVO;
 public interface BoardDAO {
 
 	/**
-	 * 게시판 글쓰기
+	 * 寃뚯떆�뙋 湲��벐湲�
 	 * @param boardVo
 	 * @throws Exception
 	 */
-	// 게시글 작성
+	// 寃뚯떆湲� �옉�꽦
 	public void write(BoardVO boardVo) throws Exception;
 	
-	// 게시물 목록 조회
-	public List<BoardVO> list() throws Exception;
+	// 寃뚯떆臾� 紐⑸줉 議고쉶
+	public List<BoardVO> list(BoardVO vo) throws Exception;
 	
-	// 게시물 조회
+	// 寃뚯떆臾� 議고쉶
 	public BoardVO read(int NUMBER) throws Exception;
+	
+	// 寃뚯떆臾� �닔�젙
+	public void update(BoardVO boardVO) throws Exception;
+	
+	// 寃뚯떆臾� �궘�젣
+	public void delete(int NUMBER) throws Exception;
+
 
 }

@@ -13,7 +13,7 @@
             <a class="nav-link" href="/writing">Enrollment</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Profile</a>
+            <a class="nav-link" href="/memberUpdateView">Profile</a>
           </li>
         </ul>
       </div>

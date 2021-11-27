@@ -1,6 +1,6 @@
 package com.portfolio.Flea_Market.VO;
 
-public class BoardVO {
+public class BoardVO extends PageVO{
 
 	private int NUMBER;
 	private String TITLE;

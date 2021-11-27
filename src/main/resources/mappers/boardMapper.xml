@@ -4,6 +4,29 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="boardMapper">
+	
+	<!-- 페이징 Header -->
+	<sql id="pagingHeader">
+		<![CDATA[
+		SELECT
+		    BOARD2.*
+		FROM(
+		    SELECT
+		        COUNT(*) OVER() AS totalRecordCount,
+		        BOARD1.*
+		    FROM(
+		]]>
+	</sql>
+
+	<!-- 페이징 Footer -->
+	<sql id="pagingFooter">
+		<![CDATA[
+                 			 ) BOARD1
+			) BOARD2
+			WHERE	BOARD2.RNUM BETWEEN ${start} AND ${end}
+		]]>
+	</sql>
+
    <insert id="insert" parameterType="com.portfolio.Flea_Market.VO.BoardVO">
    		INSERT INTO TB_BOARD(
 								 TITLE
@@ -27,9 +50,11 @@
    								,'N'
    		)
    </insert>
-   	<select id="list" resultType="com.portfolio.Flea_Market.VO.BoardVO">
+   	<select id="list" parameterType="com.portfolio.Flea_Market.VO.BoardVO" resultType="com.portfolio.Flea_Market.VO.BoardVO">
+		<include refid="pagingHeader" />
 		SELECT   
-				 NUMBER
+				 ROW_NUMBER() OVER (ORDER BY NUMBER DESC) AS RNUM				 
+			   , NUMBER
 			   , TITLE
 			   , PRICE
 			   , REGION
@@ -39,6 +64,24 @@
 			   , REGIST_DATE
 			   , APPLY_YN
 		  FROM TB_BOARD
+		  WHERE 1=1
+		  <if test='searchType != null and searchType != ""'>
+		  		<choose>
+		  			<when test='searchType.equals("TITLE")'>
+		  				AND TITLE LIKE CONCAT('%', #{searchText}, '%')
+		  			</when>
+		  			<when test='searchType.equals("CONTENT")'>
+		  				AND CONTENT LIKE CONCAT('%', #{searchText}, '%')
+		  			</when>
+		  			<when test='searchType.equals("REGION")'>
+		  				AND REGION LIKE CONCAT('%', #{searchText}, '%')
+		  			</when>
+		  			<otherwise>
+		  				
+		  			</otherwise>
+		  		</choose>
+		  </if>
+		  <include refid="pagingFooter" />
 	</select>
 	
 	<select id="read" parameterType="int" resultType="com.portfolio.Flea_Market.VO.BoardVO">
@@ -55,4 +98,20 @@
 		 FROM TB_BOARD
 		 WHERE NUMBER = #{NUMBER}
 	</select>
+	    <update id="update" parameterType="com.portfolio.Flea_Market.VO.BoardVO">
+		UPDATE TB_BOARD
+		   SET TITLE    =   #{TITLE},
+		   	   PRICE    =   #{PRICE},
+		   	   REGION   =   #{REGION},
+		   	   CONTENT  =   #{CONTENT},
+		   	   MASTER_EMAIL = #{MASTER_EMAIL},
+		   	   REGIST_DATE = #{REGIST_DATE}
+		 WHERE NUMBER = #{NUMBER} 
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE 
+		  FROM TB_BOARD
+		 WHERE NUMBER = #{NUM}
+	</delete>
 </mapper>
