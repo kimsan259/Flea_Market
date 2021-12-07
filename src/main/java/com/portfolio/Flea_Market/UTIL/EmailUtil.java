@@ -17,7 +17,7 @@ public class EmailUtil {
 
 	public void mailSend(String email, String pw) {
 		
-		// �̸��� ������ ��� ����
+		// 占싱몌옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙占� 占쏙옙占쏙옙
 		Properties prop = System.getProperties();
 
 	        prop.put("mail.smtp.starttls.enable", "true");
@@ -33,40 +33,40 @@ public class EmailUtil {
 	        prop.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
 	        
-	    // end �̸��� ������ ��� ����
+	    // end 占싱몌옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙占� 占쏙옙占쏙옙
 
-	        //2. �Ʊ� ������ ���� ���� ��ü ������ (�θ�� �ڽ� ����� �̷��� ��ü ���� ����)
-	        //���� EmailAuth auth = new EmailAuth(); �� ���������� �θ� ��ü�� �ʿ��ؼ� ������ ������ ��
+	        //2. 占싣깍옙 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙 占쏙옙占쏙옙 占쏙옙체 占쏙옙占쏙옙占쏙옙 (占싸몌옙占� 占쌘쏙옙 占쏙옙占쏙옙占� 占싱뤄옙占쏙옙 占쏙옙체 占쏙옙占쏙옙 占쏙옙占쏙옙)
+	        //占쏙옙占쏙옙 EmailAuth auth = new EmailAuth(); 占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙 占싸몌옙 占쏙옙체占쏙옙 占십울옙占쌔쇽옙 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙
 	        Authenticator auth = new EmailAuth();
 
-	        // �̸��� ������ ��ɰ� ���� ���� ������ ��Ƽ� 
+	        // 占싱몌옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙占� 占쏙옙占쏙옙 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙티占� 
 	        Session session = Session.getDefaultInstance(prop, auth);
 
-	        // ����� ����
-	        // �̰��� ���� ������ ���� �Է��Ͽ� ������ ���� ��ü��
+	        // 占쏙옙占쏙옙占� 占쏙옙占쏙옙
+	        // 占싱곤옙占쏙옙 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙 占쌉뤄옙占싹울옙 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙 占쏙옙체占쏙옙
 	        MimeMessage msg = new MimeMessage(session);
 
 	        try {
 	        	
-	        	//������ ��¥
+	        	//占쏙옙占쏙옙占쏙옙 占쏙옙짜
 	            msg.setSentDate(new Date());
 
-	            //������ ���
+	            //占쏙옙占쏙옙占쏙옙 占쏙옙占�
 	            msg.setFrom(new InternetAddress("fleamarket@gmail.com", "ADMIN"));
 
-	            //�޴� ��� ����
+	            //占쌨댐옙 占쏙옙占� 占쏙옙占쏙옙
 	            InternetAddress to = new InternetAddress(email);         
 
-	            //�޴� ��� �̸���
+	            //占쌨댐옙 占쏙옙占� 占싱몌옙占쏙옙
 	            msg.setRecipient(Message.RecipientType.TO, to);            
 
-	            //�޴� ��� ����
-	            msg.setSubject("안녕하세요 벼룩시장입니다.","UTF-8");           
+	            //占쌨댐옙 占쏙옙占� 占쏙옙占쏙옙
+	            msg.setSubject("임시비밀번호 발송내역입니다..","UTF-8");           
 
-	            //�޴� ��� ����
-	            msg.setText("비밀번호는" + pw + "입니다.", "UTF-8");
+	            //占쌨댐옙 占쏙옙占� 占쏙옙占쏙옙
+	            msg.setText("임시비밀번호 : " + pw + "  로그인 후 수정부탁드립니다.", "UTF-8");
 	            
-	            //���������� ���� ������
+	            //占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙
 	            Transport.send(msg);
 
 

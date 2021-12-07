@@ -175,30 +175,91 @@ public class HomeController {
 	}
 	@RequestMapping(value="/memberUpdateView", method = RequestMethod.GET)
 	public String registerUpdateView(MemberVO vo, Model model, HttpSession session) throws Exception{
+		System.out.println("llog");
+		System.out.println(session.getAttribute("email"));
 		
 		vo.setEMAIL((String) session.getAttribute("email"));
 		vo.setNAME((String) session.getAttribute("name"));
 		
 		model.addAttribute("member", vo);
+		
 		return "/memberUpdateView";
 	}
 
 	@RequestMapping(value="/memberUpdate", method = RequestMethod.POST)
 	public String registerUpdate(MemberVO vo, HttpSession session) throws Exception{
 		
+		System.out.println("log");
+		System.out.println(vo.getEMAIL());
 		memberService.memberUpdate(vo);
 		
 		session.invalidate();
 		
 		return "redirect:/";
 	}
+	// 회원 탈퇴 get
+	@RequestMapping(value="/memberDeleteView", method = RequestMethod.GET)
+	public String memberDeleteView() throws Exception{
+		return "/memberDeleteView";
+	}
 	
+	// 회원 탈퇴 post
+	@RequestMapping(value="/memberDelete", method = RequestMethod.POST)
+	public String memberDelete(MemberVO vo, HttpSession session, RedirectAttributes rttr) throws Exception{
+		
+		// 세션에 있는 member를 가져와 member변수에 넣어줍니다.
+		MemberVO member = (MemberVO) session.getAttribute("member");
+		// 세션에있는 비밀번호
+		String sessionPass = member.getPASSWORD();
+		// vo로 들어오는 비밀번호
+		String voPass = vo.getPASSWORD();
+		
+		if(!(sessionPass.equals(voPass))) {
+			rttr.addFlashAttribute("msg", false);
+			return "redirect:/memberDeleteView";
+		}
+		memberService.memberDelete(vo);
+		session.invalidate();
+		return "redirect:/";
+	}
 	@RequestMapping("/writing")
 	public String writing() {
 		
 		return "writing";
 	}
-	
+	// 패스워드 체크
+		@ResponseBody
+		@RequestMapping(value="/passChk", method = RequestMethod.POST)
+		public int passChk(MemberVO vo) throws Exception {
+			int result = memberService.passChk(vo);
+			return result;
+		}
+		// 아이디 중복 체크
+		@ResponseBody
+		@RequestMapping(value="/idChk", method = RequestMethod.POST)
+		public int idChk(MemberVO vo) throws Exception {
+			int result = memberService.idChk(vo);
+			return result;
+		}
+
+		// 회원가입 post
+		@RequestMapping(value = "/register", method = RequestMethod.POST)
+		public String postRegister(MemberVO vo) throws Exception {
+			logger.info("post register");
+			int result = memberService.idChk(vo);
+			try {
+				if(result == 1) {
+					return "/register";
+				}else if(result == 0) {
+					memberService.join(vo);
+				}
+				// 요기에서~ 입력된 아이디가 존재한다면 -> 다시 회원가입 페이지로 돌아가기 
+				// 존재하지 않는다면 -> register
+			} catch (Exception e) {
+				throw new RuntimeException();
+			}
+			return "redirect:/";
+		}
 	/**
 	 * 게시판 글쓰기
 	 * @param board
@@ -298,10 +359,17 @@ public class HomeController {
 //				return "login";
 //			}
 		
+		HttpSession session = request.getSession();
+		
+		
+		session.setAttribute("email",member.getEMAIL());
+		session.setAttribute("name",member.getNAME());
+		session.setAttribute("nickname",member.getNICKNAME());
+		session.setAttribute("phonenum",member.getPHONENUMBER());
 		MemberVO memberVo;
 		String url = "login";
 		
-		HttpSession session = request.getSession();
+		
 		
 		try {
 			memberVo = memberService.login(member);
@@ -344,6 +412,8 @@ public class HomeController {
 		
 		try {
 			
+			System.out.println("log");
+			System.out.println(request.getSession().getAttribute("sessionMember"));
 			//세션값 가져오기 (수정 삭제버튼 보여주기 체크)
 			sessionMember = (MemberVO) request.getSession().getAttribute("sessionMember");
 			

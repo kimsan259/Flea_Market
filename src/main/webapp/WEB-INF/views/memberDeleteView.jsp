@@ -9,7 +9,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 	 	
 	 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-		<title>회원가입</title>
+		<title>회원탈퇴</title>
 	</head>
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -26,23 +26,8 @@
 					$("#PASSWORD").focus();
 					return false;
 				}
-				if($("#NAME").val()==""){
-					alert("성명을 입력해주세요.");
-					$("#NAME").focus();
-					return false;
-				}
-			});
-			
-
-		
-			$("#sub_del").on("click", function(){
-				if($("#PASSWORD").val()==""){
-					alert("비밀번호를 입력해주세요.");
-					$("#PASSWORD").focus();
-					return false;
-				}
 				$.ajax({
-					url : "/passChk",
+					url : "/member/passChk",
 					type : "POST",
 					dataType : "json",
 					data : $("#delForm").serializeArray(),
@@ -62,12 +47,13 @@
 				
 			});
 			
+				
+			
 		})
 	</script>
 	<body>
-
 		<section id="container">
-			<form action="/memberUpdate" method="post" id="delForm">
+			<form action="/member/memberDelete" method="post" id="delForm">
 				<div class="form-group has-feedback">
 					<label class="control-label" for="EMAIL">이메일아이디</label>
 					<input class="form-control" type="text" id="EMAIL" name="EMAIL" value="${member.EMAIL}" readonly="readonly"/>
@@ -78,17 +64,18 @@
 				</div>
 				<div class="form-group has-feedback">
 					<label class="control-label" for="NAME">성명</label>
-					<input class="form-control" type="text" id="NAME" name="NAME" value="${member.NAME}"/>
+					<input class="form-control" type="text" id="NAME" name="NAME" value="${member.NAME}" readonly="readonly"/>
 				</div>
-				<div class="form-group has-feedback">
-					<button class="btn btn-success" type="submit" id="submit">회원정보수정</button>
-					<button class="btn btn-success" type="button" id="sub_del">회원탈퇴</button>
-					<button class="cencle btn btn-danger" type="button">취소</button>
-				</div>
-				
-
-				
 			</form>
+			<div class="form-group has-feedback">
+				<button class="btn btn-success" type="button" id="submit">회원탈퇴</button>
+				<button class="cencle btn btn-danger" type="button">취소</button>
+			</div>
+			<div>
+				<c:if test="${msg == false}">
+					비밀번호가 맞지 않습니다.
+				</c:if>
+			</div>
 		</section>
 		
 	</body>

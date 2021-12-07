@@ -5,7 +5,7 @@ import com.portfolio.Flea_Market.VO.MemberVO;
 public interface MemberService {
 
 	/**
-	 * 로그인
+	 * 濡쒓렇�씤
 	 * @param memberVo
 	 * @return
 	 * @throws Exception
@@ -13,14 +13,14 @@ public interface MemberService {
 	public MemberVO login(MemberVO memberVo) throws Exception;
 	
 	/**
-	 * 회원가입
+	 * �쉶�썝媛��엯
 	 * @param memberVo
 	 * @throws Exception
 	 */
 	public void join(MemberVO memberVo) throws Exception;
 	
 	/**
-	 * 비밀번호를 찾기 위한 이메일 유무 파악
+	 * 鍮꾨�踰덊샇瑜� 李얘린 �쐞�븳 �씠硫붿씪 �쑀臾� �뙆�븙
 	 * @param memberVo
 	 * @return
 	 * @throws Exception
@@ -28,7 +28,7 @@ public interface MemberService {
 	public MemberVO findEmail(MemberVO memberVo) throws Exception;
 	
 	/**
-	 * 비밀번효 변경
+	 * 鍮꾨�踰덊슚 蹂�寃�
 	 * @param memberVo
 	 * @return
 	 * @throws Exception
@@ -37,4 +37,9 @@ public interface MemberService {
 	
 	public void memberUpdate(MemberVO vo) throws Exception;
 	
+	public void memberDelete(MemberVO vo) throws Exception;
+	
+	public int passChk(MemberVO vo) throws Exception;
+	
+	public int idChk(MemberVO vo) throws Exception;
 }

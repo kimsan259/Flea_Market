@@ -15,12 +15,15 @@
 		$(document).ready(function(){
 			// 취소
 			$(".cencle").on("click", function(){
-				
 				location.href = "/";
-						    
 			})
-		
+			
 			$("#submit").on("click", function(){
+				if($("#EMAIL").val()==""){
+					alert("아이디를 입력해주세요.");
+					$("#EMAIL").focus();
+					return false;
+				}
 				if($("#PASSWORD").val()==""){
 					alert("비밀번호를 입력해주세요.");
 					$("#PASSWORD").focus();
@@ -31,46 +34,39 @@
 					$("#NAME").focus();
 					return false;
 				}
-			});
-			
-
-		
-			$("#sub_del").on("click", function(){
-				if($("#PASSWORD").val()==""){
-					alert("비밀번호를 입력해주세요.");
-					$("#PASSWORD").focus();
-					return false;
+				var idChkVal = $("#idChk").val();
+				if(idChkVal == "N"){
+					alert("중복확인 버튼을 눌러주세요.");
+				}else if(idChkVal == "Y"){
+					$("#regForm").submit();
 				}
-				$.ajax({
-					url : "/passChk",
-					type : "POST",
-					dataType : "json",
-					data : $("#delForm").serializeArray(),
-					success: function(data){
-						
-						if(data==0){
-							alert("패스워드가 틀렸습니다.");
-							return;
-						}else{
-							if(confirm("회원탈퇴하시겠습니까?")){
-								$("#delForm").submit();
-							}
-							
-						}
-					}
-				})
-				
 			});
-			
 		})
+		
+		function fn_idChk(){
+			$.ajax({
+				url : "/member/idChk",
+				type : "post",
+				dataType : "json",
+				data : {"EMAIL" : $("#EMAIL").val()},
+				success : function(data){
+					if(data == 1){
+						alert("중복된 아이디입니다.");
+					}else if(data == 0){
+						$("#idChk").attr("value", "Y");
+						alert("사용가능한 아이디입니다.");
+					}
+				}
+			})
+		}
 	</script>
 	<body>
-
 		<section id="container">
-			<form action="/memberUpdate" method="post" id="delForm">
+			<form action="/member/register" method="post" id="regForm">
 				<div class="form-group has-feedback">
-					<label class="control-label" for="EMAIL">이메일아이디</label>
-					<input class="form-control" type="text" id="EMAIL" name="EMAIL" value="${member.EMAIL}" readonly="readonly"/>
+					<label class="control-label" for="EMAIL">아이디</label>
+					<input class="form-control" type="text" id="EMAIL" name="EMAIL" />
+					<button class="idChk" type="button" id="idChk" onclick="fn_idChk();" value="N">중복확인</button>
 				</div>
 				<div class="form-group has-feedback">
 					<label class="control-label" for="PASSWORD">패스워드</label>
@@ -78,17 +74,14 @@
 				</div>
 				<div class="form-group has-feedback">
 					<label class="control-label" for="NAME">성명</label>
-					<input class="form-control" type="text" id="NAME" name="NAME" value="${member.NAME}"/>
+					<input class="form-control" type="text" id="NAME" name="NAME" />
 				</div>
-				<div class="form-group has-feedback">
-					<button class="btn btn-success" type="submit" id="submit">회원정보수정</button>
-					<button class="btn btn-success" type="button" id="sub_del">회원탈퇴</button>
-					<button class="cencle btn btn-danger" type="button">취소</button>
-				</div>
-				
-
 				
 			</form>
+				<div class="form-group has-feedback">
+					<button class="btn btn-success" type="button" id="submit">회원가입</button>
+					<button class="cencle btn btn-danger" type="button">취소</button>
+				</div>
 		</section>
 		
 	</body>
